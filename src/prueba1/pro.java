@@ -5,61 +5,71 @@
  */
 package prueba1;
 
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.Locale;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.util.Scanner;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.ScheduledFuture;
+import java.util.concurrent.TimeUnit;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
 
 /**
  *
  * @author aculledor
  */
 public class pro {
+    
+    File myObj;
+    Scanner myReader;
+   private final ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1);
 
     public pro() {
-        this.work();
+        this.work2();
     }
     
     public void work(){
-        try{
-            //Days of calendar
-            System.out.println("Days of the week");
-            System.out.println("Sunday: " + Calendar.SUNDAY);       //1
-            System.out.println("Monday: " + Calendar.MONDAY);       //2
-            System.out.println("Tuesday: " + Calendar.TUESDAY);     //3
-            System.out.println("Wednesday: " + Calendar.WEDNESDAY); //4
-            System.out.println("Thrusday: " + Calendar.THURSDAY);   //5
-            System.out.println("Friday: " + Calendar.FRIDAY);       //6
-            System.out.println("Saturday: " + Calendar.SATURDAY);   //7
-            
-            //Get day of week from date
-            System.out.println("\nDay of the week frome Date class");
-            Date hoy = new Date();
-            Calendar cal = Calendar.getInstance();
-            cal.setTime(hoy);
-            System.out.println(cal.get(Calendar.DAY_OF_WEEK));
-            
-            //Get day of week from string date
-            System.out.println("\nDay of the week frome String date");
-            DateFormat format = new SimpleDateFormat("dd/MM/yy");
-            Date str = format.parse("23/04/21");
-            System.out.println(str);
-            Calendar cal2 = Calendar.getInstance();
-            cal2.setTime(str);
-            System.out.println(cal.get(Calendar.DAY_OF_WEEK));
-            
-            //Get String date from date
-            System.out.println("\nString date from Date");
-            Date today = new Date();
-            DateFormat format2 = new SimpleDateFormat("dd/MM/yy");
-            String dateToday = format2.format(today);
-            System.out.println(dateToday);
-        }catch(Exception e){
-            e.printStackTrace();
+        try {
+            myObj = new File("rr1.txt");
+            myReader = new Scanner(myObj);
+//            final ScheduledExecutorService executorService = Executors.newSingleThreadScheduledExecutor();
+//            executorService.scheduleAtFixedRate(() -> {
+//                if (myReader.hasNextLine()) {
+//                    String data = myReader.nextLine();
+//                    System.out.println(data);
+//                }
+//            }, 0, 1, TimeUnit.SECONDS);
+            while (myReader.hasNextLine()) {
+                String data = myReader.nextLine();
+                System.out.println(data);
+                Thread.sleep(1000);
+            }
+            myReader.close();
+        } catch (FileNotFoundException ex) {
+          System.out.println("An error occurred.");
+          ex.printStackTrace();
+        } catch (InterruptedException ex) {
+            Logger.getLogger(pro.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    } 
+    
+    public void work2(){
+        try {
+            File myObj = new File("rr1.txt");
+            Scanner myReader = new Scanner(myObj);
+            Runnable beeper = () -> {
+                if (myReader.hasNextLine()) {
+                    String data = myReader.nextLine();
+                    System.out.println(data);
+                }
+            };
+            ScheduledFuture<?> beeperHandle = scheduler.scheduleAtFixedRate(beeper, 0, 1, TimeUnit.SECONDS);
+//            Runnable canceller = () -> beeperHandle.cancel(false);
+//            scheduler.schedule(canceller, 1, TimeUnit.HOURS);
+        } catch (FileNotFoundException ex) {
+            ex.printStackTrace();
         }
     } 
     
